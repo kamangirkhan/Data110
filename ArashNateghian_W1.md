@@ -6,7 +6,7 @@
 ---
 # Introduction
 
-Last year, I moved here from Iran, leaving behind everything and everyone I once knew. It was a difficult decision—especially leaving my family—but it was a necessary step.
+Over two years have passed since I lost my beloved wife. We were meant to share this journey together, side by side. The day she learned that we had won the lottery, she was very excited—she had always dreamed of leaving Iran, and what better destination than America? Leaving Iran, along with my family and friends, was incredibly difficult, but under the circumstances, it was the best decision I could have made.
 
 As a newcomer, there were several essentials needed to start a new life:
 - SSID
