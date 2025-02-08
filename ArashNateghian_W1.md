@@ -48,7 +48,7 @@ So I defined new goals for the year 2025
 
 ---
 # More
-- These days I am learning Python with one of my friends in Iran and this is a simple practice of my learning:
+- These days, I'm learning Python with a friend in Iran, and here's a simple exercise to practice what I've learned:
 
 ```r
 a=int(input())
@@ -58,30 +58,21 @@ else:
     b=(str(a%10)+str((a//10)%10)+str(a//100))
     print(2*int(b))
 ```
-- I usually spend my free time watching TV, walking, hanging out with my cousins, and photographing.
+
+|    My Hobbies    | Favorite Colors | Favorite Sports |
+|------------------|-----------------|-----------------|
+| movies & Seiries |      Blue       |      Soccer     |
+|      Hiking      |      Green      |    Swimming     |
+|   Photographing  |      Orange     |    Ping Pong    |
+
 - As an amateur photographer, sometimes I share my photos at [Gurushots](https://gurushots.com/) and learn from professionals.
 - Here are some of them:
-
-![Fire](https://github.com/kamangirkhan/Data110/blob/main/Fire.png)
-![MD](https://github.com/kamangirkhan/Data110/blob/main/MD.png)
-![Paris](https://github.com/kamangirkhan/Data110/blob/main/Paris.png)
-![Germany](https://github.com/kamangirkhan/Data110/blob/main/Germany.png)
-
-
-
+  
+![MD](https://github.com/kamangirkhan/Data110/blob/main/MD.png)[^1]
+![Paris](https://github.com/kamangirkhan/Data110/blob/main/Paris.png)[^2]
+![Germany](https://github.com/kamangirkhan/Data110/blob/main/Germany.png)[^3]
 
 ---
-# Tables
-Below is a simple table comparing programming languages:
-
-| Language  | Paradigm        | Year Released |
-|-----------|-----------------|---------------|
-| R         | Statistical     | 1993          |
-| Python    | General-purpose | 1991          |
-| JavaScript| Web Development | 1995          |
-
-
----
-# Footnote
-This is an example sentence.[^label]
-[^label]: footnote text is displayed at the end of the page.
+[^1]: Sunset in a neighborhood in Rochville.
+[^2]: Eiffel Tower’s Birthday night.
+[^3]: Holocaust Museum, Berlin.
