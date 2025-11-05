@@ -1,9 +1,3 @@
----
-output: html_document
-editor_options: 
-  chunk_output_type: inline
----
-
 # ABS Transactions Analysis — Fully Annotated
 **Author:** Arash Nateghiyan  
 **Purpose:** Post-cleaning analytics, sales performance, and market basket analysis on ABS transaction data.
@@ -900,3 +894,4 @@ readr::write_csv(bottom10_items_all_stores, "bottom30_items_all_stores.csv")
 ## Final Notes
 - The Apriori thresholds (`supp`, `conf`) should be tuned to your **basket size** and **SKU breadth**.
 - Re-run this notebook **only** after refreshing `TransactionData_Clean.csv` from your ETL.
+
