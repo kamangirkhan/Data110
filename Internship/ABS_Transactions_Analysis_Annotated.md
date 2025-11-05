@@ -245,7 +245,20 @@ size_counts <- transactionsnew %>%
   summarise(Count = n(), .groups = "drop") %>%
   arrange(desc(Count))
 ```
+```r
 
+ggplot(size_counts, 
+       aes(x = UnitType, y = Count, size = Count, color = CLASSIFICATIONDEPARTMENT)) +
+  geom_point(alpha = 0.7) +
+  scale_size(range = c(3, 12)) +
+  labs(
+    title = "Counts of Product Sizes & Beer Packs by Department",
+    x = "Unit Type (Bottle Size or Pack Size)",
+    y = "Count"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
 ---
 ## 12) Category Mix by Store (Pivot)
 
@@ -271,6 +284,7 @@ dept_sales_by_store <- transactions %>%
 ## 13) Weekday / Weekend / Holiday Sales
 
 ```r
+
 transactions$TRANSDATE <- as.Date(transactions$TRANSDATE)
 
 ny_range  <- seq(as.Date("2023-12-21"), as.Date("2024-12-24"), by="day")
@@ -308,7 +322,18 @@ avg_totals <- daily_sales %>%
   group_by(DayType) %>%
   summarise(AverageDailySales = mean(DailySales), .groups = "drop")
 ```
+```r
 
+ggplot(avg_totals, aes(x = DayType, y = AverageDailySales, fill = DayType)) +
+  geom_col(width = 0.6) +
+  labs(
+    title = "Average Total Sales by Day Type",
+    x = "Day Category",
+    y = "Average Total Sales ($)"
+  ) +
+  theme_minimal() +
+  scale_fill_manual(values = c("steelblue", "darkorange", "darkred"))
+```
 ---
 ## 14) Daily Sales — FY23-24 vs FY24-25
 
@@ -333,7 +358,39 @@ fy24_25_aligned <- fy24_25 %>% mutate(FirstOfMonth=floor_date(TRANSDATE,"month")
                                       WeekdayOffset=wday(FirstOfMonth,week_start=1)-1,
                                       DayAligned=Day+WeekdayOffset)
 ```
+```r
+weekday_labels <- rep(c("Mon","Tue","Wed","Thu","Fri","Sat","Sun"), length.out = 40)
 
+ggplot(fy23_24_aligned, aes(x = DayAligned, y = TotalSales, color = Month, group = Month)) +
+  geom_line(size = 1.1) +
+  labs(
+    title = "Daily Sales by Month — FY 2023–2024 (Aligned to Weekday Start)",
+    x = "Aligned Calendar Day",
+    y = "Sales ($)"
+  ) +
+  scale_x_continuous(
+    breaks = seq(1, 40, by = 1),
+    labels = weekday_labels
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 8))
+```
+```r
+
+ggplot(fy24_25_aligned, aes(x = DayAligned, y = TotalSales, color = Month, group = Month)) +
+  geom_line(size = 1.1) +
+  labs(
+    title = "Daily Sales by Month — FY 2024–2025 (Aligned to Weekday Start)",
+    x = "Aligned Calendar Day",
+    y = "Sales ($)"
+  ) +
+  scale_x_continuous(
+    breaks = seq(1, 40, by = 1),
+    labels = weekday_labels
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 8))
+```
 ---
 ## 15) Weekday Sales Ranking
 
@@ -344,7 +401,18 @@ weekday_sales <- transactions %>%
   summarise(TotalSales = sum(NETAMOUNT, na.rm = TRUE), .groups = "drop") %>%
   arrange(TotalSales)
 ```
+```r
 
+ggplot(weekday_sales, aes(x = reorder(Weekday, TotalSales), y = TotalSales)) +
+  geom_col(fill = "steelblue") +
+  geom_text(aes(label = scales::dollar_format()(round(TotalSales,0))),
+            vjust = -0.5, size = 3.5) +
+  labs(
+    title = "Total Sales by Weekday",
+    x = "Weekday", y = "Total Sales ($)"
+  ) +
+  theme_minimal()
+```
 ---
 
 ## 16) Monthly Sales — Compare Fiscal Years
@@ -369,7 +437,22 @@ fy24_25_monthly <- transactions %>%
 
 combined_monthly <- rbind(fy23_24_monthly, fy24_25_monthly)
 ```
+```r
 
+ggplot(combined_monthly, aes(x = MonthIndex, y = TotalSales, color = FiscalYear, group = FiscalYear)) +
+  geom_line(linewidth = 1.3) +
+  geom_point(size = 3) +
+  scale_x_continuous(
+    breaks = 1:12,
+    labels = c("Jul","Aug","Sep","Oct","Nov","Dec","Jan","Feb","Mar","Apr","May","Jun")
+  ) +
+  scale_color_manual(values = c("FY23-24"="steelblue", "FY24-25"="darkorange")) +
+  labs(
+    title = "Monthly Total Sales Comparison: FY23–24 vs FY24–25",
+    x = "Month", y = "Total Sales ($)", color = "Fiscal Year"
+  ) +
+  theme_minimal()
+```
 ---
 ## 17) Store Summary — Sales, Transactions, Baskets (FY24-25)
 
@@ -466,6 +549,65 @@ store_fy24_25_quad <- store_fy24_25_final %>%
   )
 ```
 
+```r
+# Sales vs Traffic
+
+ggplot(store_fy24_25_quad, aes(x = TotalTransactionsPerSqFt,
+                                y = TotalSalesPerSqFt,
+                                color = Quad_Sales_Traffic,
+                                label = STORENAME)) +
+  geom_point(size = 4) +
+  geom_text(vjust = -0.6, size = 3) +
+  geom_vline(xintercept = traffic_median, linetype = "dashed") +
+  geom_hline(yintercept = sales_median, linetype = "dashed") +
+  labs(
+    title = "Quadrant: Sales Efficiency vs Traffic Efficiency",
+    x = "Transactions per SqFt",
+    y = "Sales per SqFt",
+    color = "Quadrant"
+  ) +
+  theme_minimal()
+```
+
+```r
+# Sales vs Basket
+
+ggplot(store_fy24_25_quad, aes(x = TotalBasketsPerSqFt,
+                                y = TotalSalesPerSqFt,
+                                color = Quad_Sales_Baskets,
+                                label = STORENAME)) +
+  geom_point(size = 4) +
+  geom_text(vjust = -0.6, size = 3) +
+  geom_vline(xintercept = basket_median, linetype = "dashed") +
+  geom_hline(yintercept = sales_median, linetype = "dashed") +
+  labs(
+    title = "Quadrant: Sales Efficiency vs Basket Density",
+    x = "Baskets per SqFt",
+    y = "Sales per SqFt",
+    color = "Quadrant"
+  ) +
+  theme_minimal()
+```
+
+```r
+# Traffic vs Basket
+
+ggplot(store_fy24_25_quad, aes(x = TotalBasketsPerSqFt,
+                                y = TotalTransactionsPerSqFt,
+                                color = Quad_Traffic_Baskets,
+                                label = STORENAME)) +
+  geom_point(size = 4) +
+  geom_text(vjust = -0.6, size = 3) +
+  geom_vline(xintercept = basket_median, linetype = "dashed") +
+  geom_hline(yintercept = traffic_median, linetype = "dashed") +
+  labs(
+    title = "Quadrant: Traffic Efficiency vs Basket Density",
+    x = "Baskets per SqFt",
+    y = "Transactions per SqFt",
+    color = "Quadrant"
+  ) +
+  theme_minimal()
+```
 ---
 ## 21) Demographics vs Store Performance
 
