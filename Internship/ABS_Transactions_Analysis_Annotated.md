@@ -1,8 +1,7 @@
+
 # ABS Transactions Analysis — Fully Annotated
 **Author:** Arash Nateghiyan  
 **Purpose:** Post-cleaning analytics, sales performance, and market basket analysis on ABS transaction data.
-
-> This document expands your working script with rich commentary on **what** each block does and **why** it matters.
 
 ---
 ## 1) Load Libraries & Dataset
@@ -645,12 +644,64 @@ summary(lm(TotalSales ~ X25YearsOld, data = store_fy24_25_summary))
 cor(store_fy24_25_summary$TotalSales, store_fy24_25_summary$PovertyLevel, use = "complete.obs")
 summary(lm(TotalSales ~ PovertyLevel, data = store_fy24_25_summary))
 
-# 15e) Twice Poverty vs Sales
+```
+```r
 
-cor(store_fy24_25_summary$TotalSales, store_fy24_25_summary$TwicePovertyLevel, use = "complete.obs")
-summary(lm(TotalSales ~ TwicePovertyLevel, data = store_fy24_25_summary))
+ggplot(store_fy24_25_summary,
+       aes(x = SquareFootage, y = TotalSales)) +
+  geom_point(size = 3, color = "steelblue") +
+  geom_smooth(method = "lm", se = TRUE, color = "darkred") +
+  labs(
+    title = "Total Sales vs Store Square Footage",
+    x = "Store Square Footage",
+    y = "Total Sales ($)"
+  ) +
+  theme_minimal()
+```
+```r
+
+ggplot(store_fy24_25_summary,
+       aes(x = TotalPopulation, y = TotalSales)) +
+  geom_point(size = 3, color = "steelblue") +
+  geom_smooth(method = "lm", se = TRUE, color = "darkred") +
+  labs(
+    title = "Total Sales vs Local Population",
+    x = "Total Population in Store Trade Area",
+    y = "Total 2024 Sales ($)"
+  ) +
+  theme_minimal()
+```
+```r
+
+ggplot(store_fy24_25_summary,
+       aes(x = X25YearsOld, y = TotalSales)) +
+  geom_point(size = 3, color = "steelblue") +
+  geom_smooth(method = "lm", se = TRUE, color = "darkred") +
+  labs(
+    title = "Total Sales vs % Population Age 25+",
+    x = "Population Age 25+",
+    y = "Total Sales (2024)"
+  ) +
+  theme_minimal()
+```
+```r
+
+ggplot(store_fy24_25_summary,
+       aes(x = PovertyLevel, y = TotalSales)) +
+  geom_point(size = 3, color = "steelblue") +
+  geom_smooth(method = "lm", se = TRUE, color = "darkred") +
+  labs(
+    title = "Total Sales vs % Population Below Poverty Level",
+    x = "Residents Below Poverty Level",
+    y = "Total Sales (2024)"
+  ) +
+  theme_minimal()
 ```
 
+# Aggregate items per basket
+
+
+inspe
 ---
 ## 22) Market Basket Analysis (Apriori)
 
@@ -747,7 +798,60 @@ bottom30_items_all_stores <- fy24_25 %>%
   slice_min(total_qty, n = 30, with_ties = FALSE) %>%
   arrange(total_qty)
 ```
+```r
 
+ggplot(top5_items_per_store,
+       aes(x = reorder(DESCRIPTION, total_qty),
+           y = total_qty)) +
+  geom_col(fill = "#2E86C1") +
+  coord_flip() +
+  facet_wrap(~ STORENAME, scales = "free_y") +
+  labs(
+    title = "Top 5 Selling ItemIDs per Store (FY24-25)",
+    x = "Product",
+    y = "Total Quantity Sold"
+  ) +
+  scale_x_discrete(labels = function(x) str_wrap(x, width = 20)) +
+  theme_minimal(base_size = 8)
+
+ggplot(top10_items_all_stores,
+       aes(x = reorder(DESCRIPTION, total_qty),
+           y = total_qty)) +
+  geom_col(fill = "steelblue") +
+  coord_flip() +
+  labs(
+    title = "Top 5 Selling Items Across All Stores (FY24-25)",
+    x = "Product",
+    y = "Total Quantity Sold"
+  ) +
+  theme_minimal(base_size = 12)
+
+ggplot(bottom5_items_per_stores,
+       aes(x = reorder(DESCRIPTION, total_qty),
+           y = total_qty)) +
+  geom_col(fill = "#2E86C1") +
+  coord_flip() +
+  facet_wrap(~ STORENAME, scales = "free_y") +
+  labs(
+    title = "Bottom 5 Selling ItemIDs per Store (FY24-25)",
+    x = "Product",
+    y = "Total Quantity Sold"
+  ) +
+  scale_x_discrete(labels = function(x) str_wrap(x, width = 20)) +
+  theme_minimal(base_size = 8)
+
+ggplot(bottom10_items_all_stores,
+       aes(x = reorder(DESCRIPTION, total_qty),
+           y = total_qty)) +
+  geom_col(fill = "steelblue") +
+  coord_flip() +
+  labs(
+    title = "Bottom 10 Selling Items Across All Stores (FY24-25)",
+    x = "Product",
+    y = "Total Quantity Sold"
+  ) +
+  theme_minimal(base_size = 12)
+```
 ---
 ## Data Processing Flowchart
 ```
