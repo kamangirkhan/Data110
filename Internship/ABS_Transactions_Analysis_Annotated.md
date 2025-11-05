@@ -877,21 +877,4 @@ MBA (Apriori) — Cross-Sell
 Top/Bottom SKU Reports
 ```
 
----
-
-## Save Key Tables (optional)
-
-```r
-readr::write_csv(store_fy24_25_final, "store_fy24_25_final.csv")
-readr::write_csv(top5_items_per_store, "top5_items_per_store.csv")
-readr::write_csv(top10_items_all_stores, "top10_items_all_stores.csv")
-readr::write_csv(bottom5_items_per_stores, "bottom5_items_per_stores.csv")
-readr::write_csv(bottom10_items_all_stores, "bottom30_items_all_stores.csv")
-```
-
----
-
-## Final Notes
-- The Apriori thresholds (`supp`, `conf`) should be tuned to your **basket size** and **SKU breadth**.
-- Re-run this notebook **only** after refreshing `TransactionData_Clean.csv` from your ETL.
 
