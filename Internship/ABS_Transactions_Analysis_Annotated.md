@@ -1,3 +1,8 @@
+---
+output: html_document
+editor_options: 
+  chunk_output_type: inline
+---
 
 # ABS Transactions Analysis — Fully Annotated
 **Author:** Arash Nateghiyan  
@@ -30,6 +35,7 @@ transactions <- read.csv(
 ## 2)  Filter out unwanted rows and handle missing/invalid data
 
 ```r
+
 transactions <- transactions |>
   filter(
     STORENAME != "Westwood",
@@ -45,6 +51,7 @@ transactions <- transactions |>
 ## 3) Clean and normalize text columns
 
 ```r
+
 transactions <- transactions |>
   mutate(
     CLASSIFICATIONDEPARTMENT = trimws(CLASSIFICATIONDEPARTMENT),
@@ -62,6 +69,7 @@ transactions <- transactions |>
 ## 4) Normalize PACKUNIT values
 
 ```r
+
 transactions <- transactions %>%
   mutate(
     PACKUNIT = case_when(
@@ -75,6 +83,7 @@ transactions <- transactions %>%
 ## 5) Fix inconsistent pack unit labels
 
 ```r
+
 transactions <- transactions %>%
   mutate(
     PACKUNIT = case_when(
@@ -93,6 +102,7 @@ transactions <- transactions %>%
 ## 6) Fix missing BEER classification type
 
 ```r
+
 transactions$CLASSIFICATIONTYPE <- ifelse(
   (transactions$CLASSIFICATIONTYPE == "" |
      transactions$CLASSIFICATIONTYPE == "NULL" |
@@ -147,6 +157,8 @@ transactions_clean <- transactions %>%
   ) %>%
   ungroup() %>%
   select(-has_size)
+  
+transactions <- transactions_clean
 
 # Manual override rules for edge cases 
 
@@ -236,6 +248,7 @@ store_high_value_share <- transactions %>%
 ## 11) Bottle / Pack Size Popularity
 
 ```r
+
 transactionsnew <- transactions %>%
   mutate(UnitType = ifelse(CLASSIFICATIONDEPARTMENT == "BEER", PACKUNIT, SIZE))
 
@@ -698,10 +711,6 @@ ggplot(store_fy24_25_summary,
   theme_minimal()
 ```
 
-# Aggregate items per basket
-
-
-inspe
 ---
 ## 22) Market Basket Analysis (Apriori)
 
@@ -751,17 +760,17 @@ fy24_25 <- transactions %>%
 top5_items_per_store <- fy24_25 %>%
   group_by(STORENAME, ITEMID, DESCRIPTION) %>%
   summarise(
-    total_qty   = sum(TOTALQTY,  na.rm = TRUE),
-    total_sales = sum(NETAMOUNT, na.rm = TRUE),
-    .groups = "drop_last"
+    total_qty = sum(TOTALQTY, na.rm = TRUE),
+    total_sales = sum(NETAMOUNT, na.rm = TRUE)
   ) %>%
+  ungroup() %>%
+  group_by(STORENAME) %>%
   slice_max(total_qty, n = 5, with_ties = FALSE) %>%
-  arrange(STORENAME, desc(total_qty)) %>%
-  ungroup()
+  arrange(STORENAME, desc(total_qty))
 
 # Top 30 overall by qty
 
-top10_items_all_stores <- fy24_25 %>%
+top30_items_all_stores <- fy24_25 %>%
   group_by(ITEMID, DESCRIPTION) %>%
   summarise(
     total_qty   = sum(TOTALQTY,  na.rm = TRUE),
@@ -774,16 +783,16 @@ top10_items_all_stores <- fy24_25 %>%
 # Bottom 5 by qty per store (stock only)
 
 bottom5_items_per_stores <- fy24_25 %>%
-  filter(ITEMTAG == "ST") %>%
+  filter(ITEMTAG == "ST") %>% 
   group_by(STORENAME, ITEMID, DESCRIPTION) %>%
   summarise(
-    total_qty   = sum(TOTALQTY,  na.rm = TRUE),
-    total_sales = sum(NETAMOUNT, na.rm = TRUE),
-    .groups = "drop_last"
+    total_qty = sum(TOTALQTY, na.rm = TRUE),
+    total_sales = sum(NETAMOUNT, na.rm = TRUE)
   ) %>%
+  ungroup() %>%
+  group_by(STORENAME) %>%
   slice_min(total_qty, n = 5, with_ties = FALSE) %>%
-  arrange(STORENAME, total_qty) %>%
-  ungroup()
+  arrange(STORENAME, total_qty)
 
 # Bottom 30 overall (stock only)
 
@@ -814,7 +823,7 @@ ggplot(top5_items_per_store,
   scale_x_discrete(labels = function(x) str_wrap(x, width = 20)) +
   theme_minimal(base_size = 8)
 
-ggplot(top10_items_all_stores,
+ggplot(top30_items_all_stores,
        aes(x = reorder(DESCRIPTION, total_qty),
            y = total_qty)) +
   geom_col(fill = "steelblue") +
@@ -840,13 +849,13 @@ ggplot(bottom5_items_per_stores,
   scale_x_discrete(labels = function(x) str_wrap(x, width = 20)) +
   theme_minimal(base_size = 8)
 
-ggplot(bottom10_items_all_stores,
+ggplot(bottom30_items_all_stores,
        aes(x = reorder(DESCRIPTION, total_qty),
            y = total_qty)) +
   geom_col(fill = "steelblue") +
   coord_flip() +
   labs(
-    title = "Bottom 10 Selling Items Across All Stores (FY24-25)",
+    title = "Bottom 30 Selling Items Across All Stores (FY24-25)",
     x = "Product",
     y = "Total Quantity Sold"
   ) +
