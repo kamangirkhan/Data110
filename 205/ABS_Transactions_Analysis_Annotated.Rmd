@@ -1,9 +1,7 @@
 ---
 title: "ABS Transactions Analysis — Fully Annotated"
-author: "Arash Nateghiyan"
-editor_options:
-  chunk_output_type: inline
-output: pdf_document
+author: "Arash Nateghian"
+output: html_document
 ---
 
 ## 1) Load Libraries & Dataset
@@ -28,7 +26,7 @@ transactions <- read.csv(
   quote = "\""
 )
 ```
----
+
 ## 2)  Filter out unwanted rows and handle missing/invalid data
 
 ```{r}
@@ -44,7 +42,7 @@ transactions <- transactions |>
     (TAGDESC == "STOCK")
   )
 ```
----
+
 ## 3) Clean and normalize text columns
 
 ```{r}
@@ -62,7 +60,7 @@ transactions <- transactions |>
     DESCRIPTION = DESCRIPTION %>% str_trim() %>% str_squish() %>% str_to_upper()
   )
 ```
----
+
 ## 4) Normalize PACKUNIT values
 
 ```{r}
@@ -76,7 +74,7 @@ transactions <- transactions %>%
     )
   )
 ```
----
+
 ## 5) Fix inconsistent pack unit labels
 
 ```{r}
@@ -95,7 +93,7 @@ transactions <- transactions %>%
     )
   )
 ```
----
+
 ## 6) Fix missing BEER classification type
 
 ```{r}
@@ -109,7 +107,7 @@ transactions$CLASSIFICATIONTYPE <- ifelse(
   transactions$CLASSIFICATIONTYPE
 )
 ```
----
+
 ## 7) # Standardize Product Descriptions
 
 ```{r}
@@ -175,7 +173,7 @@ transactions <- transactions %>%
     )
   )
 ```
----
+
 ## 8) Data Quality & Structure Diagnostics
 
 ```{r}
@@ -191,7 +189,7 @@ if(any(na_counts > 0)) {
 }
 ```
 
----
+
 ## 9) Product Mix & Size Performance
 
 ```{r}
@@ -212,7 +210,7 @@ transactions %>%
   summarise(TotalSales = sum(NETAMOUNT, na.rm = TRUE))
 ```
 
----
+
 ## 10) High-Value Transactions (> $200)
 
 ```{r}
@@ -241,7 +239,7 @@ store_high_value_share <- transactions %>%
   arrange(desc(HighValueShare))
 ```
 
----
+
 ## 11) Bottle / Pack Size Popularity
 
 ```{r}
@@ -266,9 +264,9 @@ ggplot(size_counts,
     y = "Count"
   ) +
   theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
 ```
----
+
 ## 12) Category Mix by Store (Pivot)
 
 ```{r}
@@ -289,7 +287,7 @@ dept_sales_by_store <- transactions %>%
   pivot_wider(names_from = CLASSIFICATIONDEPARTMENT, values_from = TotalSales, values_fill = 0)
 ```
 
----
+
 ## 13) Weekday / Weekend / Holiday Sales
 
 ```{r}
@@ -343,7 +341,7 @@ ggplot(avg_totals, aes(x = DayType, y = AverageDailySales, fill = DayType)) +
   theme_minimal() +
   scale_fill_manual(values = c("steelblue", "darkorange", "darkred"))
 ```
----
+
 ## 14) Daily Sales — FY23-24 vs FY24-25
 
 ```{r}
@@ -400,7 +398,7 @@ ggplot(fy24_25_aligned, aes(x = DayAligned, y = TotalSales, color = Month, group
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 8))
 ```
----
+
 ## 15) Weekday Sales Ranking
 
 ```{r}
@@ -422,7 +420,7 @@ ggplot(weekday_sales, aes(x = reorder(Weekday, TotalSales), y = TotalSales)) +
   ) +
   theme_minimal()
 ```
----
+
 
 ## 16) Monthly Sales — Compare Fiscal Years
 
@@ -462,7 +460,7 @@ ggplot(combined_monthly, aes(x = MonthIndex, y = TotalSales, color = FiscalYear,
   ) +
   theme_minimal()
 ```
----
+
 ## 17) Store Summary — Sales, Transactions, Baskets (FY24-25)
 
 ```{r}
@@ -486,7 +484,7 @@ store_fy24_25_final <- store_fy24_25_summary %>%
   arrange(STORENAME)
 ```
 
----
+
 ## 18) Add Square Footage & Efficiency Metrics
 
 ```{r}
@@ -506,7 +504,7 @@ sales_median   <- median(store_fy24_25_final$TotalSalesPerSqFt,        na.rm = T
 basket_median  <- median(store_fy24_25_final$TotalBasketsPerSqFt,      na.rm = TRUE)
 ```
 
----
+
 ## 19) Basket Structure — Avg Basket $ and Items
 
 ```{r}
@@ -531,7 +529,7 @@ store_fy24_25_final <- store_fy24_25_final %>%
   arrange(STORENAME)
 ```
 
----
+
 ## 20) Quadrant Classification: Sales, Traffic & Basket Density
 
 ```{r}
@@ -617,7 +615,7 @@ ggplot(store_fy24_25_quad, aes(x = TotalBasketsPerSqFt,
   ) +
   theme_minimal()
 ```
----
+
 ## 21) Demographics vs Store Performance
 
 
@@ -708,7 +706,7 @@ ggplot(store_fy24_25_summary,
   theme_minimal()
 ```
 
----
+
 ## 22) Market Basket Analysis (Apriori)
 
 ```{r}
@@ -743,7 +741,7 @@ rules <- apriori(
 inspect(head(sort(rules, by = "lift"), 20))
 ```
 
----
+
 ## 23) Top/Bottom SKUs — Store & District
 
 ```{r}
@@ -819,7 +817,8 @@ ggplot(top5_items_per_store,
   ) +
   scale_x_discrete(labels = function(x) str_wrap(x, width = 20)) +
   theme_minimal(base_size = 8)
-
+```
+```{r}
 ggplot(top30_items_all_stores,
        aes(x = reorder(DESCRIPTION, total_qty),
            y = total_qty)) +
@@ -831,7 +830,8 @@ ggplot(top30_items_all_stores,
     y = "Total Quantity Sold"
   ) +
   theme_minimal(base_size = 12)
-
+```
+```{r}
 ggplot(bottom5_items_per_stores,
        aes(x = reorder(DESCRIPTION, total_qty),
            y = total_qty)) +
@@ -845,7 +845,8 @@ ggplot(bottom5_items_per_stores,
   ) +
   scale_x_discrete(labels = function(x) str_wrap(x, width = 20)) +
   theme_minimal(base_size = 8)
-
+```
+```{r}
 ggplot(bottom30_items_all_stores,
        aes(x = reorder(DESCRIPTION, total_qty),
            y = total_qty)) +
@@ -858,7 +859,7 @@ ggplot(bottom30_items_all_stores,
   ) +
   theme_minimal(base_size = 12)
 ```
----
+
 ## Data Processing Flowchart
 ```
 Clean CSV (TransactionData_Clean.csv)
