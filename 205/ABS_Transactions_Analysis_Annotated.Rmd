@@ -1,7 +1,9 @@
 ---
 title: "ABS Transactions Analysis — Fully Annotated"
 author: "Arash Nateghian"
-output: html_document
+output: 
+  html_document: 
+    keep_md: true
 ---
 
 ## 1) Load Libraries & Dataset
@@ -120,27 +122,6 @@ item_desc_conflicts <- transactions %>%
   filter(n_distinct(DESCRIPTION) > 1) %>%
   arrange(ITEMID)
 
-# Choose preferred description (the one that includes size)
-
-dict <- item_desc_conflicts %>%
-  mutate(has_size = str_detect(DESCRIPTION, "\\b[0-9.]+(ML|L|OZ|Z|LTR)\\b")) %>%
-  group_by(ITEMID) %>%
-  mutate(
-    preferred_desc = DESCRIPTION[has_size][1]  # choose version with size
-  ) %>%
-  filter(!has_size) %>%  # only the short ones need replacing
-  ungroup()
-
-# Output suggested case_when rules for manual review
-
-dict %>%
-  mutate(
-    rule = paste0(
-      'DESCRIPTION == "', DESCRIPTION, '" ~ "', preferred_desc, '"'
-    )
-  ) %>%
-  pull(rule) %>%
-  cat(sep = ",\n")
 
 # Automated cleaning method
 
@@ -167,7 +148,7 @@ transactions <- transactions %>%
       DESCRIPTION == "NEW AMSTERDAM GRAPEFRUIT" ~ "NEW AMSTERDAM GRAPEFRUIT - 50ML",
       DESCRIPTION == "L MARCA PRO -ROSE" ~ "L MARCA PRO -ROSE - 750ML",
       DESCRIPTION == "MR BOSTON TRIPLE SEC" ~ "MR BOSTON TRIPLE SEC - 1LTR",
-      DESCRIPTION == "MR BOSTON PEACH SCHNAPPS 1" ~ "MR BOSTON PEACH SCHNAPPS 1 - 1LTR",
+      DESCRIPTION == "MR BOSTON PEACH SCHNAPPS 1" ~ "MR BOSTON PEACH SCHNAPPS 1 - 1L",
       
       TRUE ~ DESCRIPTION
     )
@@ -816,7 +797,7 @@ ggplot(top5_items_per_store,
     y = "Total Quantity Sold"
   ) +
   scale_x_discrete(labels = function(x) str_wrap(x, width = 20)) +
-  theme_minimal(base_size = 8)
+  theme_minimal(base_size = 6)
 ```
 ```{r}
 ggplot(top30_items_all_stores,
@@ -844,7 +825,7 @@ ggplot(bottom5_items_per_stores,
     y = "Total Quantity Sold"
   ) +
   scale_x_discrete(labels = function(x) str_wrap(x, width = 20)) +
-  theme_minimal(base_size = 8)
+  theme_minimal(base_size = 6)
 ```
 ```{r}
 ggplot(bottom30_items_all_stores,
